@@ -25,8 +25,16 @@
       border: 1px solid #30363d; border-radius: 8px;
       background: #21213a; transition: all 0.2s;
     }
-    .courses a:hover {
+    .courses a:hover:not(.unavailable) {
       background: #2d2b55; border-color: #b388ff;
+    }
+    .courses a.unavailable {
+      color: #484f58; border-color: #21213a; cursor: default;
+      pointer-events: none;
+    }
+    .courses a .status {
+      display: block; font-size: 0.75rem; margin-top: 0.25rem;
+      color: #484f58;
     }
     .footer { margin-top: 2rem; color: #484f58; font-size: 0.8rem; }
   </style>
@@ -36,9 +44,51 @@
     <h1>Noct Labs</h1>
     <p class="subtitle">Training lab guides by Noct Information Security</p>
     <ul class="courses">
-      <li><a href="/Foundations-Of-SecOps/">Foundations of Security Operations</a></li>
+      <li><a href="/Foundations-Of-SecOps/" data-course>Foundations of Security Operations</a></li>
+      <li><a href="/Detection-Engineering-101/" data-course>Detection Engineering 101</a></li>
     </ul>
     <p class="footer">Noct Information Security, LLC</p>
   </div>
+  <script>
+    document.querySelectorAll('a[data-course]').forEach(function(link) {
+      fetch(link.href, { method: 'HEAD', mode: 'no-cors' })
+        .then(function(res) {
+          if (!res.ok && res.status !== 0) {
+            markUnavailable(link);
+          }
+        })
+        .catch(function() {
+          markUnavailable(link);
+        });
+
+      // Also check by loading the page content to detect the unpublish page
+      fetch(link.href)
+        .then(function(res) {
+          if (!res.ok) {
+            markUnavailable(link);
+            return;
+          }
+          return res.text();
+        })
+        .then(function(html) {
+          if (html && html.includes('Labs Currently Unavailable')) {
+            markUnavailable(link);
+          }
+        })
+        .catch(function() {
+          markUnavailable(link);
+        });
+    });
+
+    function markUnavailable(link) {
+      if (link.classList.contains('unavailable')) return;
+      link.classList.add('unavailable');
+      link.removeAttribute('href');
+      var status = document.createElement('span');
+      status.className = 'status';
+      status.textContent = 'Currently unavailable';
+      link.appendChild(status);
+    }
+  </script>
 </body>
 </html>
