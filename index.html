@@ -3,91 +3,279 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f1a">
   <title>Noct Information Security - Labs</title>
+  <link rel="icon" href="noct-logo.svg" type="image/svg+xml">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      color-scheme: dark;
+      --background: #0b0f1a;
+      --surface: #111827;
+      --border: #303e5b;
+      --text: #e8ecf7;
+      --muted: #a6b1cb;
+      --signal: #86c4ff;
+      --lab: #c7b5ff;
+      --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh;
-      background: #1a1a2e; color: #c9d1d9;
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font: 1rem/1.5 system-ui, sans-serif;
     }
-    .card {
-      text-align: center; padding: 3rem; max-width: 600px;
+
+    .frame {
+      width: min(100% - 2.5rem, 64rem);
+      margin-inline: auto;
     }
-    h1 { color: #b388ff; margin-bottom: 0.5rem; font-size: 2rem; }
-    .subtitle { color: #8b949e; margin-bottom: 2rem; }
-    .courses { list-style: none; }
-    .courses li { margin: 0.75rem 0; }
-    .courses a {
-      color: #b388ff; text-decoration: none; font-size: 1.125rem;
-      padding: 0.75rem 1.5rem; display: inline-block;
-      border: 1px solid #30363d; border-radius: 8px;
-      background: #21213a; transition: all 0.2s;
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: #0e1422;
     }
-    .courses a:hover:not(.unavailable) {
-      background: #2d2b55; border-color: #b388ff;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      min-height: 4rem;
+      font-size: .95rem;
+      font-weight: 650;
     }
-    .courses a.unavailable {
-      color: #484f58; border-color: #21213a; cursor: default;
+
+    .brand img { flex: none; }
+
+    main { padding-block: clamp(1.75rem, 5vw, 4.5rem) 2rem; }
+
+    .intro {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: clamp(1.5rem, 5vw, 3.75rem);
+      border: 1px solid var(--border);
+      border-top: 3px solid #4aa8ff;
+      background: linear-gradient(105deg, #141b2c 40%, #182642);
+    }
+
+    .intro::before,
+    .intro::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
       pointer-events: none;
     }
-    .courses a .status {
-      display: block; font-size: 0.75rem; margin-top: 0.25rem;
-      color: #484f58;
+
+    .intro::before {
+      inset: 0;
+      background-image: linear-gradient(#86c4ff20 1px, transparent 1px),
+                        linear-gradient(90deg, #86c4ff20 1px, transparent 1px);
+      background-size: 1.5rem 1.5rem;
+      mask-image: linear-gradient(90deg, transparent 48%, #000);
     }
-    .footer { margin-top: 2rem; color: #484f58; font-size: 0.8rem; }
+
+    .intro::after {
+      width: clamp(11rem, 24vw, 20rem);
+      aspect-ratio: 1;
+      inset-inline-end: clamp(-3.5rem, 3vw, 3.5rem);
+      top: 50%;
+      transform: translateY(-50%) rotate(-12deg);
+      background: url("noct-logo.svg") center / contain no-repeat;
+      opacity: .14;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.75rem, 8vw, 5.75rem);
+      font-weight: 750;
+      letter-spacing: -.065em;
+      line-height: 1;
+    }
+
+    .intro p {
+      margin: .8rem 0 0;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+    }
+
+    .courses {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .course {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.5rem;
+      height: 100%;
+      padding: clamp(1.15rem, 3vw, 2rem);
+      border: 1px solid var(--border);
+      border-radius: .35rem;
+      background: var(--surface);
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .course[href]:hover,
+    .course[href]:focus {
+      border-color: var(--signal);
+      background: #17243a;
+    }
+
+    .course[href]:focus-visible,
+    footer a:focus-visible {
+      outline: 3px solid var(--signal);
+      outline-offset: 4px;
+    }
+
+    .course-title {
+      max-width: 22ch;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      font-weight: 675;
+      letter-spacing: -.025em;
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+
+    .course-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      min-height: 1.65rem;
+    }
+
+    .course-status {
+      display: inline-flex;
+      align-items: baseline;
+      gap: .5rem;
+      color: var(--signal);
+      font: .8rem/1.4 var(--mono);
+    }
+
+    .course[data-state="available"] .course-status::before,
+    .course[data-state="unavailable"] .course-status::before {
+      content: "";
+      flex: none;
+      width: .45rem;
+      height: .45rem;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .course[data-state="available"] .course-status::before { background: currentColor; }
+
+    .course[data-state="checking"] .course-status { color: var(--muted); }
+
+    .course[data-state="unavailable"] .course-status { color: var(--lab); }
+
+    .course-arrow {
+      flex: none;
+      color: var(--signal);
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .course:not([href]) .course-arrow { display: none; }
+
+    footer {
+      padding-block: 1.1rem 2rem;
+      border-top: 1px solid var(--border);
+      font-size: .85rem;
+    }
+
+    footer a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.5rem;
+      color: var(--signal);
+      text-decoration: underline;
+      text-underline-offset: .2em;
+    }
+
+    @media (max-width: 36rem) {
+      .courses { grid-template-columns: 1fr; }
+      .intro::after { inset-inline-end: -2.25rem; }
+      .course-title { max-width: none; }
+    }
+
+    @media (forced-colors: active) {
+      .course[href], footer a { color: LinkText; }
+      .course[href]:focus, footer a:focus-visible { outline-color: Highlight; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Noct Labs</h1>
-    <p class="subtitle">Training lab guides by Noct Information Security</p>
-    <ul class="courses">
-      <li><a href="/Foundations-Of-SecOps/" data-course>Foundations of Security Operations</a></li>
-      <li><a href="/Detection-Engineering-101/" data-course>Detection Engineering 101</a></li>
+  <header>
+    <div class="frame brand">
+      <img src="noct-logo.svg" alt="" width="30" height="30">
+      Noct Information Security
+    </div>
+  </header>
+  <main class="frame">
+    <div class="intro">
+      <h1>Noct Labs</h1>
+      <p>Training lab guides</p>
+    </div>
+    <ul class="courses" role="list">
+      <li>
+        <a class="course" href="/Foundations-Of-SecOps/" aria-labelledby="secops-title" aria-describedby="secops-status">
+          <span class="course-title" id="secops-title">Foundations of Security Operations</span>
+          <span class="course-meta">
+            <span class="course-status" id="secops-status" aria-live="polite">Open lab guide</span>
+            <span class="course-arrow" aria-hidden="true">→</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="course" href="/Detection-Engineering-101/" aria-labelledby="de101-title" aria-describedby="de101-status">
+          <span class="course-title" id="de101-title">Detection Engineering 101</span>
+          <span class="course-meta">
+            <span class="course-status" id="de101-status" aria-live="polite">Open lab guide</span>
+            <span class="course-arrow" aria-hidden="true">→</span>
+          </span>
+        </a>
+      </li>
     </ul>
-    <p class="footer">Noct Information Security, LLC</p>
-  </div>
+  </main>
+  <footer class="frame"><a href="https://noctinfosec.com/">Noct Information Security, LLC</a></footer>
   <script>
-    document.querySelectorAll('a[data-course]').forEach(function(link) {
-      fetch(link.href, { method: 'HEAD', mode: 'no-cors' })
-        .then(function(res) {
-          if (!res.ok && res.status !== 0) {
-            markUnavailable(link);
-          }
-        })
-        .catch(function() {
-          markUnavailable(link);
-        });
+    document.querySelectorAll('.course[href]').forEach(checkCourse);
 
-      // Also check by loading the page content to detect the unpublish page
-      fetch(link.href)
-        .then(function(res) {
-          if (!res.ok) {
-            markUnavailable(link);
-            return;
-          }
-          return res.text();
-        })
-        .then(function(html) {
-          if (html && html.includes('Labs Currently Unavailable')) {
-            markUnavailable(link);
-          }
-        })
-        .catch(function() {
-          markUnavailable(link);
-        });
-    });
+    async function checkCourse(link) {
+      const status = link.querySelector('.course-status');
+      link.dataset.state = 'checking';
+      status.textContent = 'Checking availability…';
 
-    function markUnavailable(link) {
-      if (link.classList.contains('unavailable')) return;
-      link.classList.add('unavailable');
-      link.removeAttribute('href');
-      var status = document.createElement('span');
-      status.className = 'status';
-      status.textContent = 'Currently unavailable';
-      link.appendChild(status);
+      // HEAD checks reachability. A successful GET can still be the unpublished placeholder.
+      const checkHead = fetch(link.href, { method: 'HEAD', mode: 'no-cors' }).then(response => {
+        if (!response.ok && response.status !== 0) throw new Error('Course HEAD failed');
+      });
+      const checkPage = fetch(link.href).then(async response => {
+        if (!response.ok || (await response.text()).includes('Labs Currently Unavailable')) {
+          throw new Error('Course page unavailable');
+        }
+      });
+
+      try {
+        await Promise.all([checkHead, checkPage]);
+        link.dataset.state = 'available';
+        status.textContent = 'Available';
+      } catch {
+        link.dataset.state = 'unavailable';
+        link.removeAttribute('href');
+        link.removeAttribute('aria-labelledby');
+        link.removeAttribute('aria-describedby');
+        status.textContent = 'Currently unavailable';
+      }
     }
   </script>
 </body>
